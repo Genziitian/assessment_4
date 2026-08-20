@@ -22,16 +22,18 @@ class TestCourseRegistration(unittest.TestCase):
         self.assertIn("Missing prerequisite 'Data Structures'", res)
 
     def test_credit_limit_and_boundary_values(self):
-        # FIX: Add 'Programming' so STU02 meets the prerequisite for DBMS
+        # Add 'Programming' so STU02 meets the prerequisite for DBMS
         self.crs.students["STU02"]["completed"].append("Programming")
         
         # STU02 attempts: AI (4) + DBMS (4) = 8 credits (Under 12 cap) -> Should Pass
         res1 = self.crs.register_courses("STU02", ["AI", "DBMS"])
         self.assertIn("Success", res1)
         
-        # Forcing a further addition that pushes total to 15 credits breaks the boundary ceiling 
-        self.crs.students["STU02"]["completed"].append("Networking") # satisfy prereq first
-        res2 = self.crs.register_courses("STU02", ["Cloud"])
+        # FIX: Temporarily add a heavy 5-credit course to the catalog to break the 12-credit limit boundary cleanly
+        self.crs.catalog["HeavyCourse"] = {"credits": 5, "prereq": None, "capacity": 30, "slots": ["Fri 15:00"], "enrolled": 0}
+        
+        # 8 credits + 5 credits = 13 credits (Over 12 cap) -> Will trigger Credit limit exceeded
+        res2 = self.crs.register_courses("STU02", ["HeavyCourse"])
         self.assertEqual(res2, "Error: Credit limit exceeded")
 
     def test_timetable_conflict(self):
