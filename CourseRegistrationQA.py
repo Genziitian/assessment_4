@@ -22,7 +22,10 @@ class TestCourseRegistration(unittest.TestCase):
         self.assertIn("Missing prerequisite 'Data Structures'", res)
 
     def test_credit_limit_and_boundary_values(self):
-        # STU02 attempts: AI (4) + DBMS (4) + Cloud (3) = 11 credits (Under 12 cap) -> Pass
+        # FIX: Add 'Programming' so STU02 meets the prerequisite for DBMS
+        self.crs.students["STU02"]["completed"].append("Programming")
+        
+        # STU02 attempts: AI (4) + DBMS (4) = 8 credits (Under 12 cap) -> Should Pass
         res1 = self.crs.register_courses("STU02", ["AI", "DBMS"])
         self.assertIn("Success", res1)
         
