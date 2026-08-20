@@ -28,7 +28,7 @@ class InsuranceClaimSystem:
         if not has_docs: score += 35                                        # Missing documents
         if (inc_date - start).days <= 7: score += 30                        # Incident right after activation
         if claim_amt > cov: score += 25                                     # Amount higher than policy limit
-        if prev_claim_count >= 3: score += 20                               # High frequency historic claims
+        if prev_claim_count >= 3: score += 30                               # FIX: Boosted to 30 to hit MANUAL REVIEW floor
         
         # Check for multiple claims within a short 30-day window
         recent_claims = [datetime.date.fromisoformat(d) for d in self.past_claims.get(cust_id, []) if abs((inc_date - datetime.date.fromisoformat(d)).days) <= 30]
